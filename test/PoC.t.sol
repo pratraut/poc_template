@@ -12,7 +12,8 @@ contract TestPoC is Test {
     function setUp() public {
         vm.createSelectFork("https://rpc.ankr.com/eth");
         // Initialize and funds required addresses
-        poc = new PoC(address(0));
+        address attacker = makeAddr("attacker");
+        poc = new PoC(attacker);
         IPoC.TokenAmounts[] memory amounts = new IPoC.TokenAmounts[](0);
 
         // Fund it

@@ -7,6 +7,9 @@ pragma solidity 0.8.19;
 /// by clearing separating out the different actions that happen during
 /// an exploit.
 interface IPoC {
+    /// @notice structure to hold token balance
+    /// @param token address of the token. address(0) for ETH
+    /// @param amount amount of tokens
     struct TokenAmounts {
         address token;
         int256 amount;

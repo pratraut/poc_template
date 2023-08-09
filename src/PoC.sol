@@ -23,7 +23,11 @@ contract PoC is IPoC, Test {
     function fund(IPoC.TokenAmounts[] calldata amounts) external {
         for (uint256 i = 0; i < amounts.length; i++) {
             require(amounts[i].amount >= 0, "PoC: negative deal amount");
-            deal(attacker, amounts[i].token, uint256(amounts[i].amount));
+            if (amounts[i].token == address(0)) {
+                deal(attacker, uint256(amounts[i].amount));
+            } else {
+                deal(attacker, amounts[i].token, uint256(amounts[i].amount));
+            }
         }
     }
 
@@ -32,7 +36,13 @@ contract PoC is IPoC, Test {
     /// @param tokens the list of tokens to snapshot the balance of
     function snapshotBalancePre(address[] calldata tokens) external {
         for (uint256 i = 0; i < tokens.length; i++) {
-            uint256 tokenBalance = IERC20(tokens[i]).balanceOf(attacker);
+            uint256 tokenBalance = 0;
+            if (tokens[i] == address(0)) {
+                tokenBalance = attacker.balance;
+            } else {
+                tokenBalance = IERC20(tokens[i]).balanceOf(attacker);
+            }
+            
             require(
                 tokenBalance <= uint256(type(int256).max),
                 "PoC: balance too large"
@@ -55,9 +65,17 @@ contract PoC is IPoC, Test {
             tokenAmounts.length
         );
         for (uint256 i = 0; i < tokenAmounts.length; i++) {
-            int256 attackProfit = int256(
-                IERC20(tokenAmounts[i].token).balanceOf(attacker)
-            ) - tokenAmounts[i].amount;
+            int256 attackProfit;
+            if (tokenAmounts[i].token == address(0)) {
+                attackProfit = int256(
+                    attacker.balance - uint256(tokenAmounts[i].amount)
+                );
+            } else {
+                attackProfit = int256(
+                    IERC20(tokenAmounts[i].token).balanceOf(attacker)
+                ) - tokenAmounts[i].amount;
+            }
+            
             profits[i] = IPoC.TokenAmounts(tokenAmounts[i].token, attackProfit);
         }
 
@@ -68,9 +86,16 @@ contract PoC is IPoC, Test {
     function prettyPrintProfit() external {
         IPoC.TokenAmounts[] memory profits = profit();
         for (uint256 i = 0; i < profits.length; i++) {
-            console.log("\n");
-            console.log("Token: %s", profits[i].token);
-            emit log_named_decimal_int("Profit", profits[i].amount, IERC20(profits[i].token).decimals());
+            if (i == 0) {
+                console.log("Profits:");
+                console.log("============================================");
+            }
+            if (profits[i].token == address(0)) {
+                emit log_named_decimal_int("ETH", profits[i].amount, 18);
+            } else {
+                string memory symbol = IERC20(profits[i].token).symbols();
+                emit log_named_decimal_int(symbol, profits[i].amount, IERC20(profits[i].token).decimals());
+            }
         }
     }
 }
