@@ -10,6 +10,7 @@ import {Test, console} from "forge-std/Test.sol";
 contract TestPoC is Test {
     PoC public poc;
     function setUp() public {
+        vm.createSelectFork("https://rpc.ankr.com/eth");
         // Initialize and funds required addresses
         poc = new PoC(address(0));
         IPoC.TokenAmounts[] memory amounts = new IPoC.TokenAmounts[](0);
