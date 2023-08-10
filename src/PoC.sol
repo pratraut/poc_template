@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.19;
 
-import {IERC20} from "@src/interfaces/IERC20.sol";
+import {IERC20} from "forge-std/interfaces/IERC20.sol";
 
 import {IPoC} from "@src/interfaces/IPoC.sol";
 import {Test, console} from "forge-std/Test.sol";
@@ -93,7 +93,7 @@ contract PoC is IPoC, Test {
             if (profits[i].token == address(0)) {
                 emit log_named_decimal_int("ETH", profits[i].amount, 18);
             } else {
-                string memory symbol = IERC20(profits[i].token).symbols();
+                string memory symbol = IERC20(profits[i].token).symbol();
                 emit log_named_decimal_int(symbol, profits[i].amount, IERC20(profits[i].token).decimals());
             }
         }
