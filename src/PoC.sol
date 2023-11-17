@@ -26,7 +26,7 @@ contract PoC is IPoC, Test {
             if (amounts[i].token == address(0)) {
                 deal(attacker, uint256(amounts[i].amount));
             } else {
-                deal(attacker, amounts[i].token, uint256(amounts[i].amount));
+                deal(amounts[i].token, attacker, uint256(amounts[i].amount));
             }
         }
     }
